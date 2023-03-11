@@ -1,0 +1,2 @@
+isHutang = true => utang pelanggan
+isHutang = false => utang saya
