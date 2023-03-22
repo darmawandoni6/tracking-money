@@ -1,19 +1,24 @@
 import React from 'react'
-import icons from '@icons/index'
 import style from './styles/main.module.scss'
 import { getCurrencyString } from '@helpers/curency'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { getData } from '@helpers/localStorage'
+import localName from '@constants/localName'
 
-const Jubutron = ({ report, data, route }) => {
-  const navigate = useNavigate()
-  const { pathname } = useLocation()
+const Jubutron = ({ data }) => {
+  const [name, setName] = React.useState('Saya')
+
+  React.useEffect(() => {
+    const profile = getData(localName.profile)
+    if (profile) setName(profile.name)
+  }, [])
+
   return (
     <div className={style.top}>
       <div className={style.wrapperCard}>
         <div className={style.title}>
           <h1>
             <i className="fa-solid fa-circle-dollar-to-slot"></i>
-            Uang Saya
+            {`Uang ${name}`}
           </h1>
         </div>
 

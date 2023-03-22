@@ -1,63 +1,53 @@
 import React from 'react'
 import style from './styles/main.module.scss'
 import Jubutron from '@components/Jubutron'
-import Filter from './components/Filter'
-import List from './components/List'
 import ButtonAdd from '@components/ButtonAdd'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
-import stateAction from '@store/dispatchState/state.action'
-import { findUser, getUserId, pushTranskasi } from './helpers/manipulationArray'
+import path from '@constants/path'
+import Filter from './components/Filter'
+import List from './components/List'
+import localName from '@constants/localName'
+import { listData } from './helpers/array'
 
 const Transaksi = () => {
-  const [dataFilter, setDataFilter] = React.useState([])
-  const [dataTransaksi, setDataTransaksi] = React.useState({
-    uangKeluar: 0,
-    uangMasuk: 0,
-  })
   const [list, setList] = React.useState([])
-
+  const [nominal, setNominal] = React.useState({
+    uangMasuk: 0,
+    uangKeluar: 0,
+  })
   const { pathname } = useLocation()
   const navigate = useNavigate()
-  const dispatch = useDispatch()
 
   React.useEffect(() => {
-    let transaksi = localStorage.getItem('transaksi')
-    transaksi = JSON.parse(transaksi)
-    transaksi = transaksi ? transaksi : []
-
-    transaksi.forEach((element) => {
-      if (element.uangKeluar) {
-        dataTransaksi.uangKeluar += element.uangKeluar
-      } else if (element.uangMasuk) {
-        dataTransaksi.uangMasuk += element.uangMasuk
-      }
+    const { list, uangMasuk, uangKeluar } = listData()
+    setNominal({
+      uangMasuk,
+      uangKeluar,
     })
-
-    setDataTransaksi({ ...dataTransaksi })
-    setList(pushTranskasi(transaksi))
+    setList(Object.entries(list))
   }, [])
 
-  const handleBtnTrasaksi = React.useCallback(() => {
-    dispatch(stateAction.reset())
-    navigate(pathname + '/add-transaksi')
-  }, [])
+  const handleBtnTrasaksi = () => {
+    localStorage.removeItem(localName.choicePelanggan)
+    navigate(pathname + path.addTransaksi)
+  }
 
-  const handleChangeFilter = React.useCallback((e) => {
+  const handleChange = (e) => {
     const { value } = e.target
-    let transaksi = localStorage.getItem('transaksi')
-    transaksi = JSON.parse(transaksi)
-    transaksi = transaksi ? transaksi : []
+    const { list } = listData()
 
-    let data = getUserId(value)
-    if (!data) return
-
-    data = findUser(transaksi, data)
-    if (!data) return
-
-    setList(pushTranskasi(data))
-  }, [])
-
+    const entri = Object.entries(list)
+    const filter = entri.filter((item) => item[0].toLowerCase().includes(value.toLowerCase()))
+    if (!filter[0]) {
+      entri.forEach((item) => {
+        let find = item[1].filter((item) =>
+          item.user.name.toLowerCase().includes(value.toLowerCase()),
+        )
+        if (find[0]) filter.push([item[0], find])
+      })
+    }
+    setList(filter)
+  }
   return (
     <div className={style.container}>
       <Jubutron
@@ -65,18 +55,18 @@ const Transaksi = () => {
         data={[
           {
             label: 'Uang Masuk',
-            value: dataTransaksi.uangMasuk,
+            value: nominal.uangMasuk,
           },
           {
             label: 'Uang Keluar',
-            value: dataTransaksi.uangKeluar,
+            value: nominal.uangKeluar,
           },
         ]}
         route="/report-transaksi"
       />
       <ButtonAdd text="TRANSAKSI" handleClick={handleBtnTrasaksi} />
-      <Filter filter={(val) => setDataFilter(val)} handleChange={handleChangeFilter} />
-      <List data={list} filter={dataFilter} />
+      <Filter handleChange={handleChange} />
+      <List data={list} />
     </div>
   )
 }

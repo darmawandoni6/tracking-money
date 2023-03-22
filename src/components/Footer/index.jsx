@@ -2,8 +2,9 @@ import React from 'react'
 import style from './styles/main.module.scss'
 import cx from 'classnames'
 import { useLocation, useNavigate } from 'react-router-dom'
+import path from '@constants/path'
 
-const footer = ['/hutang', '/transaksi', '/list-pelanggan']
+const footer = [path.hutangPiutang, path.transaksi, path.profile]
 
 const Footer = () => {
   const { pathname } = useLocation()
@@ -23,12 +24,13 @@ const Footer = () => {
   }, [])
 
   if (!footer.includes(pathname)) return <div />
+
   return (
     <div className={style.container}>
       <div className={style.footer}>
         <div
-          className={cx(style.menu, active('/hutang') && style.active)}
-          onClick={() => handleRoute(active('/hutang'), '/hutang')}
+          className={cx(style.menu, active(path.hutangPiutang) && style.active)}
+          onClick={() => handleRoute(active(path.hutangPiutang), path.hutangPiutang)}
         >
           <div className={style.wrapper}>
             <button>
@@ -38,8 +40,8 @@ const Footer = () => {
           </div>
         </div>
         <div
-          className={cx(style.menu, active('/transaksi') && style.active)}
-          onClick={() => handleRoute(active('/transaksi'), '/transaksi')}
+          className={cx(style.menu, active(path.transaksi) && style.active)}
+          onClick={() => handleRoute(active(path.transaksi), path.transaksi)}
         >
           <div className={style.wrapper}>
             <button>
@@ -49,8 +51,8 @@ const Footer = () => {
           </div>
         </div>
         <div
-          className={cx(style.menu, active('/list-pelanggan') && style.active)}
-          onClick={() => handleRoute(active('/list-pelanggan'), '/list-pelanggan')}
+          className={cx(style.menu, active(path.profile) && style.active)}
+          onClick={() => handleRoute(active(path.profile), path.profile)}
         >
           <div className={style.wrapper}>
             <button>

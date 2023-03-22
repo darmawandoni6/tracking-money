@@ -37,14 +37,14 @@
       display: none;
       &[id='type1'] {
         &:checked ~ .custom {
-          background-color: $danger;
+          background-color: $primary;
           color: white;
           font-weight: 600;
         }
       }
       &[id='type2'] {
         &:checked ~ .custom {
-          background-color: $primary;
+          background-color: $danger;
           color: white;
           font-weight: 600;
         }
@@ -98,12 +98,12 @@
       }
       &.piutang {
         input {
-          color: $danger;
+          color: $primary;
         }
       }
       &.take {
         input {
-          color: $primary;
+          color: $danger;
         }
       }
     }
@@ -165,5 +165,13 @@
         border: 1px solid $link;
       }
     }
+  }
+}
+
+.detailUser {
+  margin-bottom: 12px;
+  p {
+    font-size: 16px;
+    font-weight: 500;
   }
 }

@@ -9,11 +9,12 @@ body {
   background: #e5e5e5;
 }
 
+a,
 p,
 h1,
 h2,
 h3 {
-  color: #2e2e2e;
+  color: $font-color;
 }
 
 table {

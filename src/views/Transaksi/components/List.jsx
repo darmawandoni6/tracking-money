@@ -1,41 +1,55 @@
 import React from 'react'
 import style from '../styles/main.module.scss'
-import { pushTranskasi } from '../helpers/manipulationArray'
-import cx from 'classnames'
+import Drawer from '@components/Drawer'
+import Detail from './Detail'
+import moment from 'moment/moment'
 
-const List = ({ filter, data }) => {
-  const [list, setList] = React.useState([])
-  const [show, setShow] = React.useState()
+const List = ({ data }) => {
+  const [show, setShow] = React.useState(false)
+  const [detail, setDetail] = React.useState({})
 
-  React.useEffect(() => {
-    if (show) {
-      const boxShadow = document.getElementById('boxShadow')
-      boxShadow.classList.add(style.boxShadow)
-      const detailTransaksi = document.getElementById('detailTransaksi')
-      detailTransaksi.style.display = 'block'
-      return () => {
-        boxShadow.classList.remove(style.boxShadow)
-        detailTransaksi.style.display = 'none'
+  const calculator = (item, status) => {
+    let res = 0
+    item.forEach((r) => {
+      if (r.isPengeluaran === status) {
+        res += r.nominal
       }
-    }
-  }, [show])
+    })
+    return res
+  }
 
-  React.useEffect(() => {
-    if (filter[0]) {
-      const res = pushTranskasi(filter)
-      setList(res)
+  const handleChoice = (item) => {
+    setShow(true)
+    setDetail(item)
+  }
+  const detailTransaksi = React.useMemo(() => {
+    if (detail.user) {
+      return [
+        {
+          label: 'Nama',
+          value: detail.user.name,
+        },
+        {
+          label: 'Phone',
+          value: detail.user.phone ?? '-',
+        },
+        {
+          label: detail.isPengeluaran ? 'Uang Keluar' : 'Uang Masuk',
+          value: detail.nominal,
+          isPengeluaran: detail.isPengeluaran,
+        },
+        {
+          label: 'Catatan',
+          value: detail.desc || '-',
+        },
+        {
+          label: 'Tanggal',
+          value: moment(detail.tgl).format('DD MMM YYYY HH:mm'),
+        },
+      ]
     }
-  }, [filter])
-
-  React.useEffect(() => {
-    setList(data)
-  }, [data])
-
-  const handleCloseBack = React.useCallback((e) => {
-    if (e.target.id === 'boxShadow') {
-      setShow(null)
-    }
-  }, [])
+    return []
+  }, [detail.user])
 
   return (
     <div className={style.list}>
@@ -47,30 +61,30 @@ const List = ({ filter, data }) => {
         </ul>
       </header>
       <section>
-        {!list[0] ? (
+        {!data[0] ? (
           <div className={style.empty}>
             <h1>Tidak ada data ...</h1>
           </div>
         ) : (
           <div className={style.data}>
-            {list.map((item, i) => (
+            {data.map((item, i) => (
               <React.Fragment key={i}>
-                <ul className={item.date && style.header}>
-                  <li>{item.date}</li>
-                  <li>{item.uangMasuk.toLocaleString('id')}</li>
-                  <li>{item.uangKeluar.toLocaleString('id')}</li>
+                <ul className={item[0] && style.header}>
+                  <li>{item[0]}</li>
+                  <li>{calculator(item[1], false).toLocaleString('id')}</li>
+                  <li>{calculator(item[1], true).toLocaleString('id')}</li>
                 </ul>
-                {item.data.map((d, id) => (
-                  <ul key={id} className={style.user} onClick={() => setShow(d)}>
+                {item[1].map((d, id) => (
+                  <ul key={id} className={style.user} onClick={() => handleChoice(d)}>
                     <li>
-                      <h4> {d.name}</h4>
+                      <h4> {d.user.name}</h4>
                       <p>{d.desc}</p>
                     </li>
                     <li className={style.uangMasuk}>
-                      {d.uangMasuk ? d.uangMasuk.toLocaleString('id') : '-'}
+                      {!d.isPengeluaran ? d.nominal.toLocaleString('id') : '-'}
                     </li>
                     <li className={style.uangKeluar}>
-                      {d.uangKeluar ? d.uangKeluar.toLocaleString('id') : '-'}
+                      {d.isPengeluaran ? d.nominal.toLocaleString('id') : '-'}
                     </li>
                   </ul>
                 ))}
@@ -79,37 +93,11 @@ const List = ({ filter, data }) => {
           </div>
         )}
       </section>
-      <div id="boxShadow" onClick={handleCloseBack} />
-      <div id="detailTransaksi" className={style.detailTransaksi}>
-        <div className={style.header}>
-          <h1>{show?.name}</h1>
-          <button className={style.close} onClick={() => setShow(null)}>
-            X
-          </button>
-        </div>
-        <div className={style.detail}>
-          <div className={style.label}>
-            {show?.uangMasuk !== '-' ? 'Uange Masuk' : 'Uang Keluar'}
-          </div>
-          <div
-            className={cx(
-              style.value,
-              show?.uangMasuk !== '-' ? style.uangMasuk : style.uangKeluar,
-            )}
-          >
-            {'Rp '}
-            {show?.uangMasuk !== '-' ? show?.uangMasuk : show?.uangKeluar}
-          </div>
-        </div>
-        <div className={style.detail}>
-          <div className={style.label}>Catatan</div>
-          <div className={style.value}>{show?.desc ? show.desc : '-'}</div>
-        </div>
-        <div className={style.detail}>
-          <div className={style.label}>Tanggal</div>
-          <div className={style.value}>{show?.date}</div>
-        </div>
-      </div>
+      <Drawer header="Detail Transaksi" show={show} setShow={() => setShow(false)}>
+        {detailTransaksi.map((item, i) => (
+          <Detail {...item} key={i} />
+        ))}
+      </Drawer>
     </div>
   )
 }

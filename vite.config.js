@@ -48,6 +48,7 @@ export default defineConfig({
     alias: {
       '@icons': path.resolve('src/constants/icons'),
       '@components': path.resolve('src/components'),
+      '@constants': path.resolve('src/constants'),
       '@helpers': path.resolve('src/helpers'),
       '@store': path.resolve('src/store'),
       '@views': path.resolve('src/views'),

@@ -3,13 +3,20 @@ import style from './styles/main.module.scss'
 import { useNavigate } from 'react-router-dom'
 import cx from 'classnames'
 import { getCurrencyString, getValue } from '@helpers/curency'
-import { useDispatch, useSelector } from 'react-redux'
-import stateAction from '@store/dispatchState/state.action'
 import moment from 'moment'
-import { errNominal, errSetId } from '../Transaksi/helpers/handleError'
+import { getData } from '@helpers/localStorage'
+import localName from '@constants/localName'
+import { saveData } from './helpers/array'
+import path from '@constants/path'
+
+const userAnonim = {
+  id: -1,
+  name: 'Anonim',
+}
 
 const AddTransaksi = () => {
   const [isPengeluaran, setPengeluaran] = React.useState(true)
+  const [user, setUser] = React.useState(userAnonim)
   const [payload, setPayload] = React.useState({
     nominal: 0,
     desc: '',
@@ -18,57 +25,33 @@ const AddTransaksi = () => {
   })
 
   const navigate = useNavigate()
-  const dispatch = useDispatch()
-  const { pelanggan } = useSelector((state) => state.dispatchState)
 
-  const handleChoice = React.useCallback(() => {
-    dispatch(stateAction.reset())
-    navigate('/pelanggan')
+  React.useEffect(() => {
+    const pelanggan = getData(localName.choicePelanggan)
+    if (pelanggan) {
+      setUser(pelanggan)
+    }
   }, [])
 
-  const handleChange = React.useCallback((e) => {
-    const { name, value } = e.target
-    let obj = { [name]: value }
-    if (name === 'tgl') {
-      obj = {
-        [name]: moment(value).format('YYYY-MM-DDTHH:mm'),
-        date: moment(value).format('YYYY-MM-DD HH:mm'),
-      }
-    }
-    setPayload((prev) => ({ ...prev, ...obj }))
-  }, [])
+  const handleChoice = () => {
+    localStorage.removeItem(localName.choicePelanggan)
+    navigate(path.pelanggan, { state: true })
+  }
 
-  const saveLocalStorage = React.useCallback((data = []) => {
-    let transaksi = localStorage.getItem('transaksi')
-    transaksi = JSON.parse(transaksi)
-    if (transaksi) {
-      let errId = errSetId(transaksi, data)
-      if (errId) return
-
-      localStorage.setItem('transaksi', JSON.stringify([...transaksi, data]))
-    } else {
-      localStorage.setItem('transaksi', JSON.stringify([{ id: 1, ...data }]))
+  const handleSubmit = () => {
+    if (payload.nominal === 0) {
+      alert('Nominal transaksi tidak boleh 0')
+      return
     }
 
-    navigate(-1)
-  }, [])
-
-  const handleSubmit = React.useCallback(() => {
-    const errNom = errNominal(payload.nominal)
-    if (errNom) return
-
-    let req = {
-      tgl: payload.date,
-      userId: pelanggan.id ?? 0,
-      desc: payload.desc,
+    const body = {
+      ...payload,
+      isPengeluaran,
+      user,
     }
-    if (isPengeluaran) {
-      req.uangKeluar = payload.nominal
-    } else {
-      req.uangMasuk = payload.nominal
-    }
-    saveLocalStorage(req)
-  }, [pelanggan, isPengeluaran, payload])
+    const err = saveData(body)
+    if (!err) navigate(-1)
+  }
 
   return (
     <div className={style.container}>
@@ -76,7 +59,7 @@ const AddTransaksi = () => {
         <button onClick={() => navigate(-1)}>
           <i className="fa-solid fa-arrow-left"></i>
         </button>
-        <h1>Tambah Utang Piutang</h1>
+        <h1>Tambah Transaksi</h1>
       </header>
       <section>
         <div className={style.select}>
@@ -110,8 +93,8 @@ const AddTransaksi = () => {
           />
         </div>
         <button className={style.choice} onClick={handleChoice}>
-          {pelanggan.name ? (
-            pelanggan.name
+          {user.id >= 0 ? (
+            user.name
           ) : (
             <>
               <i className="fa-solid fa-user-plus"></i>Pilih Kontak Pelanggan
@@ -126,7 +109,7 @@ const AddTransaksi = () => {
               type="text"
               placeholder="Masukkan catatan "
               value={payload.desc}
-              onChange={handleChange}
+              onChange={(e) => setPayload((prev) => ({ ...prev, desc: e.target.value }))}
             />
           </div>
           <div className={style.formGrub}>
@@ -134,7 +117,13 @@ const AddTransaksi = () => {
               name="tgl"
               type="datetime-local"
               placeholder="Masukkan catatan "
-              onChange={handleChange}
+              onChange={(e) =>
+                setPayload((prev) => ({
+                  ...prev,
+                  tgl: moment(e.target.value).format('YYYY-MM-DDTHH:mm'),
+                  date: moment(e.target.value).format('YYYY-MM-DD HH:mm'),
+                }))
+              }
               value={payload.tgl}
             />
           </div>

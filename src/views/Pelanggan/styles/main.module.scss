@@ -57,104 +57,37 @@
       flex: 1;
     }
   }
-  .list {
-    flex: 1;
-    padding: 0px 18px 18px 18px;
+  .wrapperList {
     overflow: auto;
-    &.main {
-      padding-bottom: 55px;
-    }
-    ul {
-      list-style: none;
-      padding: 0px;
-      cursor: pointer;
-      li {
-        h1 {
-          margin: 0px -18px;
-          padding: 8px 18px;
-          background: rgba(226, 245, 236, 0.5);
+    .list {
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      .content {
+        flex: 1;
+        p {
+          font-size: 18px;
           font-weight: 500;
-          font-size: 14px;
           line-height: 20px;
-        }
-        &.wrapper {
-          display: flex;
-          align-items: center;
-          height: 65px;
-          border-bottom: 1px solid #eaeaea;
+          text-transform: capitalize;
           &:last-child {
-            border: none;
-          }
-          .box {
-            height: 35px;
-            width: 35px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: $primary;
-            color: white;
-            font-weight: 500;
-            font-size: 18px;
-          }
-          .desc {
-            flex: 1;
-            padding: 0px 15px;
-            h3 {
-              font-weight: 400;
-              font-size: 14px;
-              line-height: 20px;
-            }
-            p {
-              font-weight: 400;
-              font-size: 12px;
-              line-height: 20px;
-              color: #848484;
-            }
+            font-weight: normal;
+            font-size: 14px;
+            color: #848484;
           }
         }
       }
+      .wa {
+        color: $primary;
+        font-size: 32px;
+        border: none;
+        background-color: transparent;
+        cursor: pointer;
+      }
+      border-bottom: 1px solid #eaeaea;
     }
   }
-}
 
-.boxShadow {
-  position: fixed;
-  top: 0px;
-  left: 0px;
-  height: 100vh;
-  width: 100vw;
-  background: rgba(12, 12, 12, 0.5);
-}
-.form {
-  position: fixed;
-  bottom: 0px;
-  width: 100%;
-  max-width: $screen;
-  border-radius: 20px 20px 0px 0px;
-  background: #ffffff;
-  padding: 25px;
-  display: none;
-  z-index: 1;
-  .header {
-    display: flex;
-    align-items: center;
-    border-bottom: 1px solid #eaeaea;
-    margin-bottom: 15px;
-    h1 {
-      flex: 1;
-      font-size: 16px;
-      line-height: 20px;
-    }
-    .close {
-      background-color: transparent;
-      color: #2e2e2e;
-      width: 35px;
-      height: 100%;
-      padding: 10px;
-      border: none;
-    }
-  }
   .formGrub {
     margin-bottom: 15px;
     label {
@@ -177,7 +110,7 @@
       line-height: 16px;
     }
   }
-  button {
+  .save {
     font-weight: 700;
     font-size: 16px;
     line-height: 25px;
@@ -185,7 +118,7 @@
     width: 100%;
     background-color: $primary;
     border: 1px solid $primary;
-    padding: 13px 0px;
+    padding: 12px 0px;
     border-radius: 8px;
     cursor: pointer;
   }

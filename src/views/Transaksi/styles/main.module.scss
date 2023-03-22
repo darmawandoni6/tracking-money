@@ -244,68 +244,28 @@
   }
 }
 
-.boxShadow {
-  position: fixed;
-  top: 0px;
-  left: 0px;
-  height: 100vh;
-  width: 100vw;
-  background: rgba(12, 12, 12, 0.5);
-  z-index: 1;
-}
-
-.detailTransaksi {
-  position: fixed;
-  bottom: 0px;
-  width: 100%;
-  max-width: $screen;
-  border-radius: 20px 20px 0px 0px;
-  background: #ffffff;
-  padding: 25px;
-  z-index: 2;
-  display: none;
-  .header {
-    display: flex;
-    align-items: center;
-    border-bottom: 1px solid #eaeaea;
-    margin-bottom: 15px;
-    h1 {
-      flex: 1;
-      font-size: 16px;
-      line-height: 20px;
+.detail {
+  margin-bottom: 15px;
+  .label {
+    color: #818181;
+    font-size: 14px;
+    line-height: 20px;
+  }
+  .value {
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+    color: #2e2e2e;
+    &.uangMasuk {
+      color: $primary;
+      font-weight: 600;
     }
-    .close {
-      background-color: transparent;
-      color: #2e2e2e;
-      width: 35px;
-      height: 100%;
-      padding: 10px;
-      border: none;
+    &.uangKeluar {
+      color: $danger;
+      font-weight: 600;
     }
   }
-  .detail {
-    margin-bottom: 15px;
-    .label {
-      color: #818181;
-      font-size: 14px;
-      line-height: 20px;
-    }
-    .value {
-      font-weight: 400;
-      font-size: 14px;
-      line-height: 20px;
-      color: #2e2e2e;
-      &.uangMasuk {
-        color: $primary;
-        font-weight: 600;
-      }
-      &.uangKeluar {
-        color: $danger;
-        font-weight: 600;
-      }
-    }
-    &:last-child {
-      margin-bottom: 0px;
-    }
+  &:last-child {
+    margin-bottom: 0px;
   }
 }

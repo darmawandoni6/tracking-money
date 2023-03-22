@@ -1,127 +1,56 @@
 import React from 'react'
 import style from './styles/main.module.scss'
-import { useNavigate } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
-import stateAction from '@store/dispatchState/state.action'
-import { getData, pushListPelanggan, sortAsc } from './helpers/manipulationArray'
-import { alertPhone, errSetId } from './helpers/handleError'
-import { initialName } from '@helpers/manipulateString'
-import cx from 'classnames'
+import { useLocation, useNavigate } from 'react-router-dom'
+import Drawer from '@components/Drawer'
+import Form from './components/Form'
+import { getData } from '@helpers/localStorage'
+import localName from '@constants/localName'
+import { sortData } from './helpers/array'
+import { chekWA } from './helpers/useCase'
 
 const Pelanggan = ({ main }) => {
+  const [list, setList] = React.useState([])
   const [show, setShow] = React.useState(false)
-  const [customers, setCustomer] = React.useState([])
-  const [payload, setPayload] = React.useState({
-    name: '',
-    phone: '',
-  })
+  const [pelanggan, setPelanggan] = React.useState()
 
   const navigate = useNavigate()
-  const dispatch = useDispatch()
-  const { pelanggan } = useSelector((state) => state.dispatchState)
+  const { state } = useLocation()
 
+  const fetchData = () => {
+    const pelanggan = sortData(getData(localName.pelanggan) ?? [])
+    setList(pelanggan)
+  }
   React.useEffect(() => {
-    let listPlanggan = localStorage.getItem('listPlanggan')
-    listPlanggan = JSON.parse(listPlanggan)
-
-    let res = pushListPelanggan(listPlanggan ? listPlanggan : [])
-
-    res = sortAsc(res, 'title')
-    res.map((item) => sortAsc(item.list, 'name'))
-
-    setCustomer(res)
+    fetchData()
   }, [])
-
-  React.useEffect(() => {
-    if (pelanggan.name) {
-      navigate(-1)
-    }
-  }, [pelanggan])
-
-  React.useEffect(() => {
-    if (show) {
-      const boxShadow = document.getElementById('boxShadow')
-      boxShadow.classList.add(style.boxShadow)
-
-      const formPelanggan = document.getElementById('formPelanggan')
-      formPelanggan.style.display = 'block'
-
-      return () => {
-        boxShadow.classList.remove(style.boxShadow)
-        formPelanggan.style.display = 'none'
-      }
-    }
-  }, [show])
-
-  const handleCloseBack = React.useCallback((e) => {
-    if (e.target.id === 'boxShadow') {
-      setShow(false)
-    }
-  }, [])
-
-  const handleChange = React.useCallback((e) => {
-    const { name, value } = e.target
-
-    if (name === 'name') {
-      return setPayload((prev) => ({ ...prev, [name]: value.toUpperCase() }))
-    }
-    setPayload((prev) => ({ ...prev, [name]: value.replace(/[^0-9]/g, '').trim() }))
-  }, [])
-
-  const saveLocalStorage = React.useCallback((listPlanggan = [], val) => {
-    if (listPlanggan) {
-      listPlanggan.push(val)
-      localStorage.setItem('listPlanggan', JSON.stringify(listPlanggan))
-      setShow(false)
-    } else {
-      localStorage.setItem('listPlanggan', JSON.stringify([val]))
-      setShow(false)
-    }
-  }, [])
-
-  const handleSubmit = React.useCallback(() => {
-    const val = {
-      ...payload,
-      name: payload.name.trim(),
-    }
-    if (!val.name || !val.phone) {
-      alert('Form wajib diisi')
-      return
-    }
-
-    let listPlanggan = getData()
-
-    const resphone = alertPhone(listPlanggan, { name: 'phone', value: val.phone })
-    if (resphone) {
-      return
-    }
-
-    const errId = errSetId(listPlanggan)
-    if (errId) {
-      return
-    }
-
-    saveLocalStorage(listPlanggan, val)
-    let res = pushListPelanggan(listPlanggan)
-    res = sortAsc(res, 'title')
-    res.map((item) => sortAsc(item.list, 'name'))
-
-    setCustomer(res)
-  }, [payload, customers])
 
   const handleSearch = (e) => {
     const { value } = e.target
-    const filter = getData().filter((item) =>
-      item.name.toLocaleLowerCase().includes(value.toLocaleLowerCase()),
-    )
+    const pelanggan = sortData(getData(localName.pelanggan) ?? [])
 
-    let res = pushListPelanggan(filter)
-
-    res = sortAsc(res, 'title')
-    res.map((item) => sortAsc(item.list, 'name'))
-
-    setCustomer(res)
+    const filter = pelanggan.filter((item) => item.name.toLowerCase().includes(value.toLowerCase()))
+    setList(filter)
   }
+
+  const handleOpenWa = (phone) => {
+    const wa = phone.replace('0', '62')
+    window.open(`https://wa.me/${wa}`)
+  }
+
+  const handleChoice = (item) => {
+    if (state) {
+      localStorage.setItem(localName.choicePelanggan, JSON.stringify(item))
+      navigate(-1)
+    } else {
+      setPelanggan(item)
+    }
+  }
+
+  const reset = () => {
+    setPelanggan(null)
+    setShow(false)
+  }
+
   return (
     <div className={style.container}>
       <header>
@@ -141,67 +70,34 @@ const Pelanggan = ({ main }) => {
         <span>Tambah Pelanggan Baru</span>
         <i className="fa-solid fa-chevron-right"></i>
       </section>
-      <section className={cx(style.list, main && style.main)}>
-        {customers.map((item, i) => (
-          <ul key={i}>
-            <li>
-              <h1>{item.title}</h1>
-              {item.list.map((l, li) => (
-                <ul key={li}>
-                  <li
-                    className={style.wrapper}
-                    onClick={() => !main && dispatch(stateAction.setPelanggan(l))}
-                  >
-                    <div className={style.box}>{initialName(l.name)}</div>
-                    <div className={style.desc}>
-                      <h3>{l.name}</h3>
-                      <p>{l.phone}</p>
-                    </div>
-                  </li>
-                </ul>
-              ))}
-            </li>
-          </ul>
+      <section className={style.wrapperList}>
+        {list.map((item) => (
+          <div className={style.list} key={item.phone}>
+            <div className={style.content} onClick={() => handleChoice(item)}>
+              <p>{item.name}</p>
+              <p>{item.phone}</p>
+            </div>
+            {chekWA(item.phone) && !state && (
+              <button className={style.wa} onClick={() => handleOpenWa(item.phone)}>
+                <i className="fa-brands fa-whatsapp"></i>
+              </button>
+            )}
+          </div>
         ))}
       </section>
-      <div id="boxShadow" onClick={handleCloseBack} />
-      <div id="formPelanggan" className={style.form}>
-        <div className={style.header}>
-          <h1>Tambah Pelanggan Baru</h1>
-          <button className={style.close} onClick={() => setShow(false)}>
-            X
-          </button>
-        </div>
-
-        <form
-          onSubmit={(e) => {
-            e.preventDefault()
-            handleSubmit()
+      <Drawer
+        header={pelanggan ? 'Edit Pelanggan' : 'Add New Pelanggan'}
+        show={show || pelanggan}
+        setShow={reset}
+      >
+        <Form
+          onClose={() => {
+            fetchData()
+            reset()
           }}
-        >
-          <div className={style.formGrub}>
-            <label>Nama Pelanggan</label>
-            <input
-              type="text"
-              name="name"
-              value={payload.name}
-              onChange={handleChange}
-              placeholder="Masukkan nama kontak pelanggan"
-            />
-          </div>
-          <div className={style.formGrub}>
-            <label>Nomor Telepon (opsional)</label>
-            <input
-              type="text"
-              name="phone"
-              value={payload.phone}
-              onChange={handleChange}
-              placeholder="Masukkan no. telp"
-            />
-          </div>
-          <button type="submit">SIMPAN</button>
-        </form>
-      </div>
+          user={pelanggan}
+        />
+      </Drawer>
     </div>
   )
 }

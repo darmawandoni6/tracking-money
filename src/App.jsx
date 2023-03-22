@@ -1,9 +1,11 @@
 import Footer from '@components/Footer'
 import React from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import path from './constants/path'
 
-const Hutang = React.lazy(() => import('./views/Hutang'))
 const HutangPiutang = React.lazy(() => import('./views/HutangPiutang'))
+const AddHutangPiutang = React.lazy(() => import('./views/AddHutangPiutang'))
+const Profile = React.lazy(() => import('./views/Profile'))
 const Pelanggan = React.lazy(() => import('./views/Pelanggan'))
 const Transaksi = React.lazy(() => import('./views/Transaksi'))
 const AddTransaksi = React.lazy(() => import('./views/AddTransaksi'))
@@ -13,27 +15,27 @@ const App = () => {
     <BrowserRouter>
       <React.Suspense fallback={<div />}>
         <Routes>
-          <Route path="/" element={<Navigate to="/hutang" />} />
+          <Route path="/" element={<Navigate to={path.hutangPiutang} />} />
           <Route
-            path="/hutang/*"
+            path={`${path.hutangPiutang}/*`}
             element={
               <Routes>
-                <Route path="/" element={<Hutang />} />
-                <Route path="/add-hutang-piutang" element={<HutangPiutang />} />
+                <Route path="/" element={<HutangPiutang />} />
+                <Route path={path.addHutangPiutang} element={<AddHutangPiutang />} />
               </Routes>
             }
           />
           <Route
-            path="/transaksi/*"
+            path={`${path.transaksi}/*`}
             element={
               <Routes>
                 <Route path="/" element={<Transaksi />} />
-                <Route path="/add-transaksi" element={<AddTransaksi />} />
+                <Route path={path.addTransaksi} element={<AddTransaksi />} />
               </Routes>
             }
           />
-          <Route path="/pelanggan" element={<Pelanggan />} />
-          <Route path="/list-pelanggan" element={<Pelanggan main={true} />} />
+          <Route path={path.pelanggan} element={<Pelanggan />} />
+          <Route path={path.profile} element={<Profile />} />
         </Routes>
       </React.Suspense>
       <Footer />
