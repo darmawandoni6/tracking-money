@@ -2,8 +2,8 @@ import React from 'react'
 import style from './styles/main.module.scss'
 
 const Drawer = ({ show, setShow, header, children }) => {
-  const idDrawer = crypto.randomUUID()
-  const idContent = crypto.randomUUID()
+  const idDrawer = React.useId()
+  const idContent = React.useId()
 
   React.useEffect(() => {
     if (show) {

@@ -8,6 +8,7 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
+      registerType: 'prompt',
       includeAssets: ['favicon.ico'],
       manifest: {
         theme_color: '#03a651',
@@ -40,6 +41,9 @@ export default defineConfig({
             type: 'image/png',
           },
         ],
+      },
+      workbox: {
+        sourcemap: true,
       },
     }),
   ],

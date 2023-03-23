@@ -53,7 +53,7 @@ const UpdateProfile = ({ show, onClose, update }) => {
         <div className={style.wrapper}>
           <div className={style.header}>
             <h1>Update Profile</h1>
-            <button>X</button>
+            <button onClick={onClose}>X</button>
           </div>
           <form
             onSubmit={(e) => {

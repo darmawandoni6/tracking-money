@@ -2,7 +2,6 @@ import Footer from '@components/Footer'
 import React from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import path from './constants/path'
-
 const HutangPiutang = React.lazy(() => import('./views/HutangPiutang'))
 const AddHutangPiutang = React.lazy(() => import('./views/AddHutangPiutang'))
 const Profile = React.lazy(() => import('./views/Profile'))

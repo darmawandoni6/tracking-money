@@ -22,8 +22,8 @@ const HutangPiutang = () => {
   React.useEffect(() => {
     let { list, utangSaya, utangPelanggan } = listData()
     setMoney({
-      utangSaya,
-      utangPelanggan,
+      utangSaya: utangSaya ?? 0,
+      utangPelanggan: utangPelanggan ?? 0,
     })
     setData(list)
   }, [])
